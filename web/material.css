@@ -1,0 +1,309 @@
+/* SwingDJ — светлая тема в духе дизайн-системы «MCP Apps for Claude»:
+   тёплый светлый фон, белые карточки с тонкой рамкой, терракотовый акцент.
+   Имена токенов (--md-*) остались прежними — на них опираются стили страниц. */
+:root {
+  color-scheme: dark;
+  /* монохром по макету: чёрный фон, серые «таблетки» и карточки, белые главные элементы */
+  --md-primary: #ffffff;          --md-on-primary: #000000;
+  --md-primary-container: #333333; --md-on-primary-container: #ffffff;
+  --md-secondary: #8e8e93;        --md-on-secondary: #000000;
+  --md-secondary-container: #2c2c2e; --md-on-secondary-container: #ffffff;
+  --md-tertiary: #9fc3ff;         --md-tertiary-container: #182c4a; --md-on-tertiary-container: #c9dcff;
+  --md-error: #ff6b61;            --md-on-error: #000000;
+  --md-error-container: #4a1513;  --md-on-error-container: #ffb4ab;
+  --md-surface: #000000;          --md-on-surface: #ffffff; --md-on-surface-variant: #8e8e93;
+  --md-surface-lowest: #1c1c1e;   --md-surface-low: #141414; --md-surface-container: #161616;
+  --md-surface-high: #232325;     --md-surface-highest: #2c2c2e;
+  --md-outline: #48484a;          --md-outline-variant: #262628;
+  --md-inverse-surface: #f2f2f2;  --md-inverse-on-surface: #000000;
+  --md-success: #6fd67a;          --md-success-container: #1d3b22;
+  --md-info: #9fc3ff;             --md-info-container: #182c4a;
+  /* форма: крупные скругления, как у «таблеток» в макете */
+  --md-shape-xs: 6px; --md-shape-s: 10px; --md-shape-m: 16px; --md-shape-l: 20px; --md-shape-xl: 24px; --md-shape-full: 999px;
+  --md-elev-1: none; --md-elev-2: 0 4px 16px #00000080; --md-elev-3: 0 8px 28px #000000a0; --md-elev-4: 0 12px 40px #000000b3;
+  /* движение */
+  --md-ease: cubic-bezier(.2, 0, 0, 1);
+  --md-ease-out: cubic-bezier(.05, .7, .1, 1);
+
+  /* старые имена — на них опираются стили страниц и разметка из JS */
+  --bg: var(--md-surface); --card: var(--md-surface-container); --line: var(--md-outline-variant);
+  --text: var(--md-on-surface); --muted: var(--md-on-surface-variant); --accent: var(--md-primary);
+
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  font-size: 14px; line-height: 20px; letter-spacing: 0;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--md-surface); color: var(--md-on-surface); }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+a { color: var(--md-primary); }
+::selection { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--md-surface-highest); border-radius: 5px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- типографика ---------- */
+.md-title-l, h1 { font-size: 22px; line-height: 28px; font-weight: 400; letter-spacing: 0; }
+h2 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .01em; color: var(--md-on-surface); margin: 0 0 12px; text-transform: none; }
+h3 { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: .04em; color: var(--md-on-surface-variant); margin: 16px 0 8px; }
+.hint { color: var(--md-on-surface-variant); font-size: 12px; line-height: 16px; letter-spacing: .03em; }
+
+/* ---------- кнопки ---------- */
+/* по умолчанию — «tonal»; .ghost/.text — текстовая; .outlined; .filled; .icon — круглая иконка */
+button {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; padding: 0 16px; border: none; border-radius: var(--md-shape-full);
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  font-size: 14px; font-weight: 500; letter-spacing: .01em; cursor: pointer; white-space: nowrap;
+  transition: box-shadow .2s var(--md-ease), background-color .2s var(--md-ease);
+  user-select: none;
+}
+/* слой состояния: hover 8%, нажатие 12% */
+button::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; background: currentColor; opacity: 0;
+  transition: opacity .15s var(--md-ease); pointer-events: none;
+}
+button:hover::before { opacity: .08; }
+button:active::before, button.pressed::before { opacity: .12; }
+button:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+button:disabled { background: #ffffff1f; color: #ffffff61; cursor: default; box-shadow: none; }
+button:disabled::before { display: none; }
+button.filled, button.primary { background: var(--md-primary); color: var(--md-on-primary); }
+button.filled:hover { box-shadow: var(--md-elev-1); }
+button.ghost, button.text { background: transparent; color: var(--md-primary); padding: 0 12px; }
+button.outlined { background: transparent; color: var(--md-primary); box-shadow: inset 0 0 0 1px var(--md-outline); }
+button.danger { color: var(--md-error); }
+button.danger.filled { background: var(--md-error-container); color: var(--md-on-error-container); }
+button.icon, .md-icon-btn {
+  width: 40px; min-width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%;
+  background: transparent; color: var(--md-on-surface-variant); font-size: 18px;
+}
+button.icon.tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+button.fab {
+  width: 56px; height: 56px; border-radius: var(--md-shape-l); padding: 0; font-size: 22px;
+  background: var(--md-primary-container); color: var(--md-on-primary-container); box-shadow: var(--md-elev-3);
+}
+button.fab:hover { box-shadow: var(--md-elev-4); }
+button.fab.large { width: 72px; height: 72px; border-radius: var(--md-shape-xl); font-size: 28px; }
+a.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 20px; border-radius: var(--md-shape-full);
+  background: var(--md-primary); color: var(--md-on-primary); text-decoration: none; font-weight: 500; letter-spacing: .01em;
+}
+a.btn:hover { box-shadow: var(--md-elev-1); }
+
+/* ripple (добавляется из common.js) */
+.md-ripple {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: -1;
+  background: currentColor; opacity: .16; transform: scale(0); animation: md-ripple .45s var(--md-ease-out) forwards;
+}
+@keyframes md-ripple { to { transform: scale(1); opacity: 0; } }
+
+/* ---------- поля ввода (filled text field) ---------- */
+input[type=number], input[type=search], input[type=text], input:not([type]), select {
+  height: 40px; padding: 0 12px; border: none; border-radius: var(--md-shape-xs) var(--md-shape-xs) 0 0;
+  background: var(--md-surface-highest); color: var(--md-on-surface);
+  box-shadow: inset 0 -1px 0 var(--md-on-surface-variant);
+  transition: box-shadow .15s var(--md-ease);
+}
+input[type=number]:hover, input[type=search]:hover, input[type=text]:hover, input:not([type]):hover, select:hover { box-shadow: inset 0 -1px 0 var(--md-on-surface); }
+input:focus, select:focus { outline: none; box-shadow: inset 0 -2px 0 var(--md-primary); }
+input::placeholder { color: var(--md-on-surface-variant); opacity: .8; }
+select { padding-right: 8px; cursor: pointer; }
+select option { background: var(--md-surface-high); }
+input[type=number] { font-variant-numeric: tabular-nums; }
+input.n2 { width: 64px; } input.n3 { width: 80px; }
+
+/* ---------- чекбоксы как переключатели M3 ---------- */
+input[type=checkbox] {
+  appearance: none; -webkit-appearance: none; flex-shrink: 0; margin: 0; cursor: pointer;
+  width: 44px; height: 26px; border-radius: 13px; position: relative;
+  background: var(--md-surface-highest); box-shadow: inset 0 0 0 2px var(--md-outline);
+  transition: background-color .2s var(--md-ease), box-shadow .2s var(--md-ease);
+}
+input[type=checkbox]::after {
+  content: ""; position: absolute; top: 7px; left: 7px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--md-outline); transition: top .2s var(--md-ease), left .2s var(--md-ease), width .2s var(--md-ease), height .2s var(--md-ease), background-color .2s var(--md-ease);
+}
+input[type=checkbox]:checked { background: var(--md-primary); box-shadow: none; }
+input[type=checkbox]:checked::after { top: 3px; left: 21px; width: 20px; height: 20px; background: var(--md-on-primary); }
+input[type=checkbox]:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+.chk { display: flex; gap: 12px; align-items: center; margin: 10px 0; cursor: pointer; }
+
+/* ---------- слайдер ---------- */
+input[type=range] {
+  -webkit-appearance: none; appearance: none; height: 20px; background: transparent; cursor: pointer; margin: 0;
+  --fill: 50%;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--md-primary) var(--fill), var(--md-secondary-container) var(--fill));
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%;
+  background: var(--md-primary); box-shadow: var(--md-elev-1); transition: box-shadow .15s;
+}
+input[type=range]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 10px #c964421f; }
+input[type=range]:active::-webkit-slider-thumb { box-shadow: 0 0 0 10px #c9644233; }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--md-secondary-container); }
+input[type=range]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--md-primary); }
+input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border: none; border-radius: 50%; background: var(--md-primary); }
+
+/* ---------- карточки ---------- */
+.md-card { background: var(--md-surface-container); border-radius: var(--md-shape-m); }
+.md-card.elevated { background: var(--md-surface-low); box-shadow: var(--md-elev-1); }
+
+/* ---------- сегментированные кнопки ---------- */
+.seg { display: flex; height: 40px; border-radius: var(--md-shape-full); box-shadow: inset 0 0 0 1px var(--md-outline); overflow: hidden; }
+.seg button {
+  flex: 1; min-height: 40px; height: 40px; border-radius: 0; padding: 0 8px; background: transparent; color: var(--md-on-surface);
+  box-shadow: inset -1px 0 0 var(--md-outline); gap: 6px;
+}
+.seg button:last-child { box-shadow: none; }
+.seg button.on { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+
+
+/* ---------- чипы ---------- */
+.chip {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--md-shape-s);
+  font-size: 12px; font-weight: 500; letter-spacing: .03em; color: #111; white-space: nowrap;
+}
+.presets button, .md-chip {
+  min-height: 32px; height: 32px; padding: 0 12px; border-radius: var(--md-shape-s);
+  background: transparent; color: var(--md-on-surface-variant); box-shadow: inset 0 0 0 1px var(--md-outline); font-size: 13px;
+}
+.presets button.on, .md-chip.on { background: var(--md-secondary-container); color: var(--md-on-secondary-container); box-shadow: none; }
+
+/* ---------- снекбар ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50;
+  min-height: 48px; display: flex; align-items: center; padding: 0 16px; border-radius: var(--md-shape-xs);
+  background: var(--md-inverse-surface); color: var(--md-inverse-on-surface); box-shadow: var(--md-elev-3);
+  font-size: 14px; white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis;
+  animation: md-in .2s var(--md-ease-out);
+}
+@keyframes md-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+
+/* ---------- линейный прогресс ---------- */
+.md-progress { position: relative; height: 24px; cursor: pointer; touch-action: none; }
+.md-progress::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 4px; border-radius: 2px; background: var(--md-secondary-container); }
+.md-progress > div { position: absolute; left: 0; top: 10px; height: 4px; width: 0; border-radius: 2px; background: var(--md-primary); }
+.md-progress > div::after { content: ""; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: var(--md-primary); opacity: 0; transition: opacity .15s; }
+.md-progress:hover > div::after { opacity: 1; }
+
+/* огоньки рядом друг с другом */
+.fires, .xb { letter-spacing: 1px; }
+
+/* =========================================================
+   Светлая тема в стиле Claude: поверх базовых компонентов
+   ========================================================= */
+/* поля ввода — белые, с тонкой рамкой, вместо «filled» с подчёркиванием */
+input[type=number], input[type=search], input[type=text], input:not([type]), select {
+  background: var(--md-surface-lowest); border-radius: var(--md-shape-s);
+  box-shadow: inset 0 0 0 1px var(--md-outline-variant);
+}
+input[type=number]:hover, input[type=search]:hover, input[type=text]:hover, input:not([type]):hover, select:hover { box-shadow: inset 0 0 0 1px var(--md-outline); }
+input:focus, select:focus { box-shadow: inset 0 0 0 1.5px var(--md-primary), 0 0 0 3px #c964421f; }
+
+/* кнопки: тональные — светло-серые с рамкой, основная — терракотовая */
+button { border-radius: var(--md-shape-s); font-weight: 500; }
+button:not(.filled):not(.primary):not(.ghost):not(.text):not(.icon):not(.fab):not(.danger) { box-shadow: inset 0 0 0 1px var(--md-outline-variant); }
+button.icon { box-shadow: none !important; }
+button:disabled { background: var(--md-surface-high); color: #ffffff59; box-shadow: none; }
+.md-ripple { opacity: .1; }
+
+/* переключатели */
+input[type=checkbox] { background: var(--md-surface-highest); box-shadow: none; }
+input[type=checkbox]::after { background: #ffffff; box-shadow: 0 1px 2px #ffffff33; top: 3px; left: 3px; width: 20px; height: 20px; }
+input[type=checkbox]:checked { background: var(--md-primary); }
+input[type=checkbox]:checked::after { background: #000000; left: 21px; }
+
+/* слайдер */
+input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--md-primary) var(--fill), var(--md-surface-highest) var(--fill)); }
+input[type=range]::-webkit-slider-thumb { background: #ffffff; box-shadow: 0 0 0 1px var(--md-outline), 0 1px 3px #ffffff33; }
+input[type=range]::-moz-range-track { background: var(--md-surface-highest); }
+input[type=range]::-moz-range-thumb { background: #ffffff; box-shadow: 0 0 0 1px var(--md-outline); }
+
+/* карточки и панели — белые с тонкой рамкой (стили страниц задают фон, тут добавляем рамку) */
+#panel section, .card, #now, #empty, .tapRow, .style-row { box-shadow: 0 0 0 1px var(--md-outline-variant); }
+
+#start > div { box-shadow: 0 0 0 1px var(--md-outline-variant), var(--md-elev-4) !important; }
+
+/* сегменты */
+.seg { box-shadow: inset 0 0 0 1px var(--md-outline-variant); background: var(--md-surface-low); padding: 0; gap: 0; height: 42px; }
+.seg button { height: auto; min-height: 0; align-self: stretch; border-radius: var(--md-shape-full); box-shadow: none !important; color: var(--md-on-surface-variant); }
+.seg button:focus-visible { outline-offset: -2px; }
+.seg button.on { background: var(--md-surface-lowest); color: var(--md-on-surface); box-shadow: 0 1px 2px #ffffff1f, 0 0 0 1px var(--md-outline-variant) !important; font-weight: 600; }
+
+/* чипы пропорций */
+.presets button, .md-chip { box-shadow: inset 0 0 0 1px var(--md-outline-variant); color: var(--md-on-surface); background: var(--md-surface-lowest); }
+.presets button.on, .md-chip.on { background: var(--md-primary-container); color: var(--md-on-primary-container); box-shadow: inset 0 0 0 1px #c9644266; }
+
+/* стили-чипы на светлом фоне: тонкая обводка, чтобы бледные цвета не терялись */
+.chip { box-shadow: inset 0 0 0 1px #ffffff1a; }
+/* маленькие кнопки-иконки в строках списков и таблиц — без рамки */
+#queue .qa button, td.act button, .style-row .del, .list .a button:not(.play), ol.list .qa button[data-da=listen], header #undo, .tapRow .icon, .ctrl .icon { box-shadow: none !important; background: transparent; }
+
+/* ---------- кнопка огоньков и всплывающий селектор ---------- */
+.fire-btn {
+  min-height: 32px; height: 32px; padding: 0 10px; gap: 6px;
+  background: var(--md-surface-lowest); color: var(--md-on-surface);
+  box-shadow: inset 0 0 0 1px var(--md-outline-variant) !important; font-size: 14px;
+}
+.fire-btn .fires { letter-spacing: 1px; }
+.fire-btn .empty { color: var(--md-on-surface-variant); font-size: 13px; }
+.fire-btn::after { content: "▾"; font-size: 10px; color: var(--md-on-surface-variant); margin-left: 2px; }
+.fire-btn:disabled::after { display: none; }
+.fire-pop {
+  position: fixed; z-index: 200; display: flex; flex-direction: column; gap: 2px; padding: 6px; min-width: 168px;
+  background: var(--md-surface-lowest); border-radius: var(--md-shape-m);
+  box-shadow: 0 0 0 1px var(--md-outline-variant), var(--md-elev-3); animation: fire-pop .14s var(--md-ease-out);
+}
+@keyframes fire-pop { from { opacity: 0; transform: translateY(-4px); } }
+.fire-pop button {
+  justify-content: flex-start; min-height: 40px; height: 40px; padding: 0 12px; border-radius: var(--md-shape-s);
+  background: transparent; color: var(--md-on-surface); box-shadow: none !important; font-size: 15px;
+}
+.fire-pop button .fires { letter-spacing: 1px; }
+.fire-pop button.on { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+.fire-pop button.on::after { content: "✓"; margin-left: auto; font-weight: 700; }
+
+/* сердечки (энергия трека) — светло-серые, как в макете; без превращения в эмодзи */
+.fires, .xb, .seg button, .presets button, .act.yes, .stamp.yes, .card .cur, #fX, th[data-sort=x] {
+  font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", Inter, "Segoe UI", sans-serif;
+}
+.fires, .xb.x1, .xb.x2, .xb.x3, .card .cur { color: #d1d1d6; }
+.xb { font-size: 15px; }
+.card .cur { font-size: 26px; }
+.seg button { font-size: 16px; }
+.seg button[data-x="0"] { font-size: 14px; }
+.seg button .ico { display: block; }
+
+/* выбранный вариант в переключателях и пропорциях — везде одинаково: ровный фон #2c2c2c, без обводки и тени */
+.seg button.on, .presets button.on { background: #2c2c2c !important; color: #fff !important; box-shadow: none !important; font-weight: 600; }
+
+/* плашки-теги стилей: цвет — стиль трека с яркостью по темпу */
+.stag { flex-shrink: 0; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; line-height: 1; white-space: nowrap; letter-spacing: .01em; }
+.stags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+/* иконка ▶/⏸ в круглых кнопках — точно по центру (треугольник смещён в самой иконке) */
+button .pp { display: block; width: 45%; height: 45%; flex-shrink: 0; }
+#queue li .qplay, td.act button, ol.list li .qa button[data-da=listen], .list .a button.play, #play { padding: 0 !important; }
+/* белый текст на светлых тегах читается за счёт лёгкой тени */
+.stag { color: #fff !important; text-shadow: none !important; box-shadow: none !important; filter: none !important; }   /* теги — плоские, без теней */
+/* огонёк — векторная иконка вместо сердечка ♥: размер по тексту вокруг (1em), стоит на строке как буква */
+.ico.fl { width: 1em; height: 1em; vertical-align: -0.14em; flex-shrink: 0; display: inline-block; }
+.fires .ico.fl + .ico.fl, .xb .ico.fl + .ico.fl, .hx .ico.fl + .ico.fl, .ph .ico.fl + .ico.fl { margin-left: -0.1em; }
+/* текст в тегах — ровно по центру плашки по высоте (без сдвига от межстрочного интервала шрифта) */
+.stag { line-height: 1 !important; padding-top: 0 !important; padding-bottom: 0 !important; align-items: center; justify-content: center; }
+
+/* фокус с клавиатуры виден всегда (мышью и пальцем — без обводки): белое кольцо поверх правил «без обводки» */
+html body :is(button, a, [tabindex], summary, [role=button], input[type=checkbox], input[type=range]):focus-visible { outline: 2px solid #fff !important; outline-offset: 2px !important; }
+html body :is(input:not([type=checkbox]):not([type=range]), select, textarea):focus-visible { outline: 2px solid #ffffff99 !important; outline-offset: 1px !important; }
+
+/* «уменьшить движение» в системе: без выездов, сдвигов и размытия */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .tm.on { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}

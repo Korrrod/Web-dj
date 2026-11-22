@@ -1,0 +1,157 @@
+/* Тиндер треков — Material 3. Базовые токены в material.css */
+:root {
+  --yes: #6fd67a; --no: #ff6b61; --later: #9fc3ff;
+}
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { display: flex; flex-direction: column; height: 100dvh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+
+/* ---- подсветка сторон при перетаскивании ---- */
+.glow { position: fixed; pointer-events: none; opacity: 0; z-index: 0; transition: opacity .15s var(--md-ease); }
+#glowL { left: 0; top: 0; bottom: 0; width: 50vw; background: linear-gradient(90deg, #e5484d99, transparent); }
+#glowR { right: 0; top: 0; bottom: 0; width: 50vw; background: linear-gradient(270deg, #3fa45b99, transparent); }
+#glowD { left: 0; right: 0; bottom: 0; height: 45vh; background: linear-gradient(0deg, #3b82d699, transparent); }
+body.dragging .glow { transition: none; }
+
+/* ---- верхняя панель ---- */
+header { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 4px; min-height: 64px; z-index: 2; }
+header .title { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+header .title b { font-size: 20px; line-height: 26px; font-weight: 400; }
+header .title span { color: var(--md-on-surface-variant); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+header select { height: 40px; border-radius: var(--md-shape-s); background: transparent; box-shadow: inset 0 0 0 1px var(--md-outline); padding: 0 10px; }
+header #undo { font-size: 20px; color: var(--md-on-surface); }
+
+/* ---- стопка карточек ---- */
+#stage { position: relative; flex: 1; margin: 4px 16px; z-index: 1; min-height: 240px; }
+.card {
+  position: absolute; inset: 0; border-radius: var(--md-shape-xl); background: var(--md-surface-high);
+  box-shadow: var(--md-elev-2); overflow: hidden; touch-action: none; user-select: none;
+  display: flex; flex-direction: column; will-change: transform;
+}
+.card.next { transform: scale(.94) translateY(16px); background: var(--md-surface-container); box-shadow: none; pointer-events: none; }
+.card.next > * { opacity: .35; }
+.card.fly { transition: transform .3s var(--md-ease), opacity .3s; }
+.card.back { transition: transform .3s cubic-bezier(.2, 1.3, .4, 1); }
+.card .band { height: 12px; flex-shrink: 0; }
+.card .body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 20px 24px; gap: 10px; text-align: center; }
+.card .bpm { font-size: 72px; font-weight: 400; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--md-primary); }
+.card .bpm small { font-size: 16px; font-weight: 500; color: var(--md-on-surface-variant); letter-spacing: .02em; }
+.card .bsrc { font-size: 12px; color: var(--md-on-surface-variant); margin-top: -4px; }
+.card .ttl { font-size: 24px; font-weight: 500; line-height: 30px; overflow-wrap: anywhere; }
+.card .art { font-size: 16px; color: var(--md-on-surface-variant); }
+.card .meta { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; color: var(--md-on-surface-variant); }
+.card .meta span:not(.chip) { height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: var(--md-shape-s); box-shadow: inset 0 0 0 1px var(--md-outline-variant); }
+.card .cm { font-size: 13px; color: var(--md-on-surface-variant); max-height: 4.2em; overflow: hidden; }
+.card .cur { font-size: 24px; min-height: 30px; letter-spacing: 1px; }
+.card .file { font-size: 11px; color: #ffffff52; overflow-wrap: anywhere; }
+
+/* штампы при перетаскивании */
+.stamp {
+  position: absolute; top: 28px; padding: 8px 16px; border: 3px solid; border-radius: var(--md-shape-m);
+  font-size: 26px; font-weight: 700; letter-spacing: .06em; opacity: 0; pointer-events: none; background: #000000cc;
+}
+.stamp.yes { left: 20px; color: var(--yes); transform: rotate(-12deg); letter-spacing: 1px; }
+.stamp.no { right: 20px; color: var(--no); transform: rotate(12deg); }
+.stamp.later { left: 50%; top: auto; bottom: 28px; transform: translateX(-50%); color: var(--later); white-space: nowrap; }
+.tint { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+
+#empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; color: var(--md-on-surface-variant); padding: 24px; border-radius: var(--md-shape-xl); background: var(--md-surface-container); }
+#empty b { color: var(--md-on-surface); font-size: 22px; font-weight: 400; }
+#empty button { width: auto; padding: 0 20px; border-radius: var(--md-shape-full); background: var(--md-secondary-container); color: var(--md-on-secondary-container); font-size: 14px; }
+
+/* ---- плеер ---- */
+#player { padding: 8px 16px 0; z-index: 2; }
+.time { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--md-on-surface-variant); font-variant-numeric: tabular-nums; }
+#progress { flex: 1; height: 24px; position: relative; cursor: pointer; touch-action: none; }
+#progress::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 4px; background: var(--md-secondary-container); border-radius: 2px; }
+#progressFill { position: absolute; left: 0; top: 10px; height: 4px; width: 0; background: var(--md-primary); border-radius: 2px; }
+#progressFill::after { content: ""; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: var(--md-primary); }
+.ctrl { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 2px; }
+.ctrl .icon { width: 48px; height: 48px; font-size: 14px; font-weight: 500; color: var(--md-on-surface); }
+.ctrl .big { width: 56px; height: 56px; border-radius: var(--md-shape-l); background: var(--md-primary-container); color: var(--md-on-primary-container); font-size: 22px; box-shadow: var(--md-elev-2); }
+.chk { margin: 0; gap: 8px; font-size: 13px; color: var(--md-on-surface-variant); }
+.chk input[type=checkbox] { transform: scale(.85); }
+
+/* ---- TAP ---- */
+.tapRow { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 6px 6px 6px 6px; border-radius: var(--md-shape-l); background: var(--md-surface-container); }
+.tap {
+  width: 80px; height: 48px; border-radius: var(--md-shape-m); font-weight: 700; letter-spacing: .12em; font-size: 15px;
+  background: var(--md-primary); color: var(--md-on-primary); touch-action: manipulation;
+}
+.tap.hit { background: var(--md-on-primary-container); transform: scale(.96); }
+.tapVal { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.15; padding-left: 4px; }
+.tapVal b { font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--md-primary); }
+.tapVal span { font-size: 11px; color: var(--md-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tapRow .icon { width: 40px; height: 40px; font-size: 14px; font-weight: 500; color: var(--md-on-surface); }
+.tapRow .save { height: 40px; min-height: 40px; padding: 0 14px; background: var(--md-success-container); color: #b8f0b8; }
+.tapRow .save:disabled { background: #ffffff1f; color: #ffffff61; }
+
+/* ---- кнопки решения ---- */
+#actions { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 12px 12px 16px; z-index: 2; }
+.act { height: 56px; min-width: 56px; border-radius: var(--md-shape-l); font-size: 20px; padding: 0 12px; letter-spacing: 1px; box-shadow: var(--md-elev-1); }
+.act.no { background: var(--md-error-container); color: var(--md-on-error-container); font-size: 22px; letter-spacing: 0; }
+.act.later { background: var(--md-info-container); color: var(--md-on-tertiary-container); letter-spacing: 0; }
+.act.yes { background: var(--md-success-container); color: #b8f0b8; }
+
+/* ---- стартовый экран (диалог) ---- */
+#start { position: fixed; inset: 0; z-index: 10; background: #000000b3; display: flex; align-items: center; justify-content: center; padding: 24px; }
+#start > div {
+  max-width: 400px; width: 100%; padding: 24px; border-radius: var(--md-shape-xl);
+  background: var(--md-surface-high); box-shadow: var(--md-elev-3); animation: md-dialog .25s var(--md-ease-out);
+}
+@keyframes md-dialog { from { opacity: 0; transform: scale(.94); } }
+#start h1 { margin: 0 0 16px; font-size: 24px; line-height: 32px; font-weight: 400; }
+#start p { color: var(--md-on-surface-variant); margin: 0 0 8px; }
+#start ul { padding-left: 20px; margin: 0 0 8px; line-height: 1.6; color: var(--md-on-surface-variant); }
+#start .g { color: var(--yes); } #start .r { color: var(--no); } #start .b { color: var(--later); }
+#go { width: 100%; height: 48px; margin: 16px 0 12px; background: var(--md-primary); color: var(--md-on-primary); font-size: 16px; }
+
+#toast { bottom: 140px; }
+
+@media (min-width: 700px) {
+  #stage { width: 440px; align-self: center; margin: 12px auto; }
+  #player, .tapRow { width: 440px; align-self: center; }
+  #player { padding: 8px 0 0; }
+}
+
+/* светлая тема */
+.card { background: var(--md-surface-lowest); box-shadow: 0 0 0 1px var(--md-outline-variant), var(--md-elev-2); }
+.card.next { background: var(--md-surface-low); box-shadow: 0 0 0 1px var(--md-outline-variant); }
+.card .file { color: #ffffff59; }
+.ctrl .big { background: var(--md-primary); color: var(--md-on-primary); }
+.tap { background: var(--md-primary); color: #000; }
+.tap.hit { background: #bdbdbd; }
+.act { box-shadow: 0 0 0 1px #ffffff0f; }
+.act.yes { background: var(--md-success-container); }
+#empty button { box-shadow: inset 0 0 0 1px var(--md-outline-variant); }
+
+/* ---------- тиндер в стиле пульта: чёрный фон, поля 10 px (на компьютере — колонка в треть экрана), без обводок и теней ---------- */
+body { background: #000; padding-left: 10px; padding-right: 10px; margin: 0 auto; }
+@media (min-width: 1024px) { body { width: 33.333vw; min-width: 420px; } }
+#stage { margin: 4px 0; flex: 0 1 460px; max-height: 460px; align-self: stretch; }
+.card, .card.next { box-shadow: none !important; outline: none !important; border: 0 !important; }
+.card { background: var(--md-surface-high); }
+.card .body { padding: 16px 18px; gap: 8px; }
+.card .bpm { font-size: 54px; }
+.card .ttl { font-size: 20px; line-height: 26px; }
+.card .art { font-size: 14px; }
+.card .meta span:not(.chip) { box-shadow: none !important; background: #ffffff0f; }
+.act, .ctrl .big, .ctrl button, header select, #empty button, .tapRow, .tapRow button { box-shadow: none !important; outline: none !important; }
+#tapHint { display: none; }
+.act .ico { width: 24px; height: 24px; }
+.act.yes .ico.fl { width: 20px; height: 20px; }
+/* выравнивание: всё (шапка, карточка, плеер, TAP, кнопки) — одной колонкой по ширине страницы и по центру экрана */
+html { background: #000; }
+#stage, #player, .tapRow, header, #actions { width: auto !important; align-self: stretch !important; margin-left: 0 !important; margin-right: 0 !important; }
+#actions { justify-content: center; }
+@media (min-width: 700px) { body { width: min(520px, 100vw); } }
+@media (min-width: 1024px) { body { width: 33.333vw; min-width: 420px; } }
+/* «＋» тег на карточке и список направлений; кнопка удаления внизу */
+.card .meta .tag-add { all: unset; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;
+  color: var(--md-on-surface-variant); background: #ffffff14; cursor: pointer; }
+.tag-menu { position: fixed; z-index: 90; min-width: 210px; padding: 6px; border-radius: 14px; background: #2c2c2e; box-shadow: 0 8px 28px #000a; display: flex; flex-direction: column; }
+.tag-menu[hidden] { display: none; }
+.tag-menu button { all: unset; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 15px; color: #fff; }
+.tag-menu button.on { background: #ffffff10; }
+.tag-menu button b { margin-left: auto; }
+.tag-menu button i { width: 10px; height: 10px; border-radius: 50%; }
+.act.trash { background: #2a2a2c; color: #ff8a80; }

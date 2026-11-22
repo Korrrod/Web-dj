@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Пульт — SwingDJ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="material.css">
+<link rel="stylesheet" href="remote.css">
+</head>
+<body>
+<header>
+  <b>Пульт</b>
+  <span id="link" class="link off"><i></i><span>…</span></span>
+  <nav><a href="/tinder"><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> тиндер</a></nav>
+</header>
+
+<div id="blocked" class="banner" hidden>Браузер на ноутбуке ещё не разрешил звук. Один раз кликните мышкой по странице плеера на ноутбуке — дальше можно управлять отсюда.</div>
+<div id="offline" class="banner" hidden>Плеер на ноутбуке не отвечает. Откройте на ноутбуке страницу SwingDJ (http://localhost:8765/) и не закрывайте её.</div>
+
+<!-- сейчас играет: как главная «таблетка» на ноутбуке — прогресс закрашивает её слева направо -->
+<section id="now" class="np">
+  <div class="np-top">
+    <div class="np-tt"><div class="ttl" id="nowTitle">—</div><div class="art" id="nowArtist"></div><div class="stags np-tags" id="nowTags"></div></div>
+    <button id="bpmBox" class="bpm-box" title="Накликать темп" disabled><b id="nowBpm">—</b><span>BPM ✎</span></button>
+  </div>
+  <div class="np-mid">
+    <div id="nowHearts" class="hearts" role="radiogroup" aria-label="Огоньки (энергия) трека"></div>
+    <span id="nowStyle" class="style-abbr"></span>
+    <span class="np-gap"></span>
+    <button id="next" class="icon" title="Следующий трек">⏭</button>
+    <button id="toggle" class="play-btn" title="Играть / пауза"><svg class="ico pp" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.5 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4c-.7-.5-1.6 0-1.6.8z"/></svg></button>
+  </div>
+  <div class="np-bot">
+    <span id="tCur" class="t-time">0:00</span>
+    <span id="gapNote" class="gap-note" hidden>пауза между треками…</span>
+    <span class="np-hint" id="seekHint">тяните по карточке — перемотка</span>
+    <span id="tLeft" class="t-time">−0:00</span>
+  </div>
+</section>
+
+<section class="card pad">
+  <div class="row">
+    <label class="vol"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex-shrink:0"><path fill="currentColor" d="M3 9.5h3.6L11 5.6v12.8l-4.4-3.9H3z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15 9.2a4 4 0 0 1 0 5.6M17.8 6.6a7.6 7.6 0 0 1 0 10.8"/></svg> <input type="range" id="vol" aria-label="Громкость" min="0" max="1" step="0.01"></label>
+    <label class="chk"><input type="checkbox" id="autoNext"> авто</label>
+  </div>
+</section>
+
+<section class="card pad">
+  <h2>Настроение</h2>
+  <div class="seg" id="energy">
+    <button data-x="0" title="любые — без фильтра по огонькам" aria-label="любые"><svg class="ico" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg></button>
+    <button data-x="1" aria-label="Огоньков: 1" title="Огоньков: 1"><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></button>
+    <button data-x="2" aria-label="Огоньков: 2" title="Огоньков: 2"><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></button>
+    <button data-x="3" aria-label="Огоньков: 3" title="Огоньков: 3"><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><svg class="ico fl" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></button>
+  </div>
+<!-- доли направлений: подписи с процентами, «＋» (добавить стиль с 0 %), полоса с ползунками; нажатие на полосу — ручка прыгает туда -->  <div id="mixBox" hidden>    <h2>Направления</h2>    <div class="rmix-labels" id="rmixLabels"></div>    <div class="rmix-track" id="rmixTrack"></div>  </div>
+</section>
+
+<section class="card pad">
+  <div class="head"><h2>Очередь</h2><button id="replan" class="small"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg> пересобрать</button></div>
+  <ol id="queue" class="list"></ol>
+</section>
+
+<section class="card pad">
+  <h2>Найти трек</h2>
+  <input id="search" type="search" aria-label="Поиск трека" placeholder="артист, название, BPM…" autocomplete="off">
+  <ol id="results" class="list"></ol>
+</section>
+
+<!-- накликать темп играющего трека -->
+<div id="bpmSheet" class="sheet-wrap" hidden>
+  <div class="sheet" role="dialog" aria-label="Темп трека">
+    <div class="sh-src" id="bpmSrc"></div>
+    <input id="bpmVal" type="number" inputmode="numeric" min="40" max="400" step="1" placeholder="BPM">
+    <button id="bpmTap" class="tap-pad">Тык</button>
+    <div class="sh-hint" id="bpmHint">стучите по «Тык» в такт музыке, 4 раза и больше</div>
+    <div class="sh-acts">
+      <button id="bpmReset" class="text">Сбросить</button>
+      <button id="bpmCancel" class="text">Отмена</button>
+      <button id="bpmSave" class="filled">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="common.js"></script>
+<script src="remote.js"></script>
+</body>
+</html>

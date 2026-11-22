@@ -1,0 +1,299 @@
+/* Пульт — в том же чёрном монохромном стиле, что и плеер на ноутбуке. Токены в material.css */
+body { padding: env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 24px); max-width: 600px; margin: 0 auto; font-size: 15px; background: #000; }
+a { text-decoration: none; }
+h2 { font-size: 17px; line-height: 24px; font-weight: 700; margin: 0 0 12px; }
+
+/* ---- верхняя панель ---- */
+header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 8px 2px;
+  background: linear-gradient(#000 75%, #0000); }
+header b { font-size: 24px; line-height: 28px; font-weight: 700; white-space: nowrap; }
+header nav { margin-left: auto; flex-shrink: 0; }
+header nav a { white-space: nowrap; display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 30px;
+  background: var(--md-surface-highest); color: #fff; font-weight: 600; font-size: 14px; }
+.link { white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 30px;
+  font-size: 12px; color: var(--md-on-surface-variant); background: var(--md-surface-container); }
+.link i { width: 8px; height: 8px; border-radius: 50%; background: var(--md-success); box-shadow: 0 0 0 3px #8fd88b33; }
+.link.off i { background: var(--md-error); box-shadow: 0 0 0 3px #ffb4ab33; }
+
+.banner { display: flex; gap: 12px; background: var(--md-surface-high); color: var(--md-on-surface); border-radius: 20px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; line-height: 20px; }
+#offline { background: var(--md-error-container); color: var(--md-on-error-container); }
+
+/* ---- «сейчас играет»: большая «таблетка», прогресс закрашивает её как на ноутбуке ---- */
+.np { --p: 0%; position: relative; margin: 4px 1px 12px; padding: 18px 18px 14px 20px; border-radius: 30px; cursor: pointer; touch-action: pan-y; user-select: none;
+  background: linear-gradient(to right, var(--md-surface-highest) 0%, #000 var(--p), var(--md-surface-highest) var(--p));
+  outline: none; }   /* без обводки */
+.np-top { display: flex; align-items: flex-start; gap: 12px; }
+.np-tt { flex: 1; min-width: 0; }
+.np .ttl { font-size: 22px; line-height: 28px; font-weight: 700; overflow-wrap: anywhere; }
+.np .art { color: var(--md-on-surface); opacity: .75; margin-top: 2px; font-size: 15px; }
+.bpm-box { display: flex; flex-direction: column; align-items: center; line-height: 1; flex-shrink: 0; min-width: 48px; padding-top: 2px; }
+.bpm-box b { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bpm-box span { font-size: 9px; font-weight: 700; letter-spacing: .08em; color: var(--md-on-surface-variant); margin-top: 3px; }
+
+.np-mid { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+.np-gap { flex: 1; }
+.hearts { display: flex; gap: 2px; flex-shrink: 0; }
+.hearts .heart { width: 36px; min-width: 36px; height: 44px; min-height: 44px; padding: 0; border-radius: 8px; background: transparent !important; box-shadow: none !important;
+  color: var(--md-on-surface-variant); font-size: 32px; line-height: 1; font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif; touch-action: manipulation; }
+.hearts .heart.on { color: #d1d1d6; }
+.hearts .heart:disabled { opacity: .4; }
+.style-abbr { font-size: 20px; font-weight: 800; color: var(--md-on-surface-variant); min-width: 36px; flex-shrink: 0; }
+.np .icon { width: 52px; min-width: 52px; height: 52px; min-height: 52px; padding: 0; border-radius: 50%; color: #fff; font-size: 20px; background: transparent !important; box-shadow: none !important; }
+.play-btn { width: 64px; height: 64px; min-height: 64px; padding: 0 0 0 3px; border-radius: 50%; flex-shrink: 0;
+  background: #fff !important; color: #000 !important; font-size: 22px; box-shadow: none !important; }
+
+.np-bot { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--md-on-surface-variant); }
+.np-bot .t-time { font-variant-numeric: tabular-nums; min-width: 38px; }
+.np-bot .t-time:last-child { text-align: right; }
+.np-hint, .gap-note { flex: 1; text-align: center; font-size: 11px; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gap-note { color: #fff; opacity: 1; }
+.gap-note:not([hidden]) + .np-hint { display: none; }
+.np.seeking { outline-color: #fff; }
+
+/* ---- карточки ---- */
+.card { background: var(--md-surface-container); border-radius: 20px; margin-bottom: 12px; overflow: hidden; }
+.card.pad { padding: 16px; }
+.row { display: flex; align-items: center; gap: 16px; }
+.vol { flex: 1; display: flex; align-items: center; gap: 12px; color: #fff; margin: 0; }
+.vol input { flex: 1; height: 32px; }
+.chk { margin: 0; color: var(--md-on-surface-variant); font-size: 14px; gap: 10px; }
+
+/* ---- настроение ---- */
+.seg { margin-bottom: 4px; height: 48px; }
+.seg button { letter-spacing: 1px; font-size: 15px; }
+.seg button:first-child { letter-spacing: normal; }
+#presetBox h2 { margin-top: 16px; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button { flex: 1 0 28%; height: 40px; min-height: 40px; font-size: 14px; border-radius: 30px; background: var(--md-surface-high); color: var(--md-on-surface-variant); }
+
+/* ---- списки (как очередь на ноутбуке) ---- */
+.head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.head h2 { margin: 0; }
+.small { min-height: 34px; height: 34px; padding: 0 14px; font-size: 13px; border-radius: 30px; background: var(--md-surface-high); color: #fff; }
+.list { list-style: none; margin: 0 -6px; padding: 0; }
+.list li { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 10px; border-radius: 16px; }
+.list li:first-child:not(.empty) { background: var(--md-surface-highest); }
+#results li:first-child:not(.empty) { background: transparent; }
+.list .dot { width: 6px; height: 36px; border-radius: 3px; background: #cfcdc4; flex-shrink: 0; }
+.list .m { flex: 1; min-width: 0; }
+.list .m b { display: block; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list .m span { display: block; font-size: 13px; color: var(--md-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list .m b.manual::before { content: "★ "; color: #fff; }
+.list .a { display: flex; gap: 2px; flex-shrink: 0; align-items: center; }
+.list .a button { width: 38px; height: 38px; min-height: 38px; padding: 0; font-size: 15px; border-radius: 50%; background: transparent; color: var(--md-on-surface-variant); }
+.list .a button.play { width: 40px; height: 40px; min-height: 40px; background: #fff; color: #000; padding-left: 2px; margin-right: 4px; }
+.list .empty { color: var(--md-on-surface-variant); padding: 12px 10px; min-height: 0; }
+#search { width: 100%; height: 52px; border-radius: 30px; padding: 0 22px; margin-bottom: 8px; box-shadow: none; background: var(--md-surface-highest); font-size: 16px; }
+#search:focus { box-shadow: inset 0 0 0 2px #fff; }
+
+#toast { bottom: 24px; }
+.list .m span .fires { display: inline; font-size: 12px; letter-spacing: 1px; color: var(--md-on-surface-variant); }
+
+/* ---- накликать темп: панель снизу ---- */
+button.bpm-box { min-height: 0; height: auto; padding: 4px 6px; border-radius: 12px; background: transparent !important; box-shadow: none !important; color: inherit; gap: 0; }
+button.bpm-box:disabled { color: inherit; opacity: 1; }
+button.bpm-box span { white-space: nowrap; }
+.sheet-wrap { position: fixed; inset: 0; z-index: 90; background: #000a; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 600px; background: var(--md-surface-container); border-radius: 28px 28px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px);
+  display: flex; flex-direction: column; align-items: stretch; gap: 14px; box-shadow: 0 -1px 0 #ffffff14; animation: sheet-up .2s var(--md-ease-out); }
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } }
+.sh-src { font-size: 13px; color: var(--md-on-surface-variant); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#bpmVal { height: 64px; font-size: 40px; font-weight: 700; text-align: center; border-radius: 20px; background: var(--md-surface-highest); box-shadow: none; font-variant-numeric: tabular-nums; }
+.tap-pad { align-self: center; width: 180px; height: 180px; min-height: 180px; border-radius: 50%; padding: 0; font-size: 30px; font-weight: 800;
+  background: #fff !important; color: #000 !important; box-shadow: none !important; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform .06s, background-color .06s; }
+.tap-pad.hit { background: #bdbdbd !important; transform: scale(.95); }
+.sh-hint { text-align: center; font-size: 13px; color: var(--md-on-surface-variant); min-height: 18px; }
+.sh-acts { display: flex; gap: 8px; }
+.sh-acts button { min-height: 48px; height: 48px; }
+.sh-acts .text { background: transparent; color: var(--md-on-surface-variant); padding: 0 12px; }
+.sh-acts .filled { flex: 1; background: #fff; color: #000; font-weight: 700; border-radius: 30px; }
+.play-btn { padding: 0 !important; }
+.play-btn .pp { width: 42%; height: 42%; display: block; }
+/* теги стилей: в карточке «сейчас играет» и в списках */
+.np-tags { margin-top: 8px; }
+.np-tags .stag { height: 28px; padding: 0 12px; font-size: 13.5px; }
+.list .m .stags { display: flex; margin-top: 4px; }
+.list .m .stag { display: inline-flex; font-size: 12.5px; color: inherit; }
+#nowStyle { display: none; }   /* сокращение стиля заменено тегами под исполнителем */
+.list .m .mt { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: visible; color: inherit; font-size: inherit; }
+.list .m .mt b { flex: 0 1 auto; min-width: 0; }
+.list .m .mt .stags { display: flex; flex-wrap: nowrap; gap: 4px; margin: 0; flex-shrink: 0; overflow: visible; }
+.hearts .heart { font-size: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
+.hearts .heart .hrt { width: 26px; height: 26px; display: block; }
+.np .icon .ico { width: 26px; height: 26px; }
+/* сердечки — белые: поставленные закрашены, непоставленные — белый контур */
+.hearts .heart, .hearts .heart.on { color: #fff !important; }
+.hearts .heart:not(.on) .hrt { opacity: .85; }
+
+/* доли направлений на пульте */
+#mixBox h2 { margin: 14px 0 10px; }
+.rmix-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 14px; }
+.rml { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--md-on-surface-variant); }
+.rml b { color: #fff; font-size: 17px; font-variant-numeric: tabular-nums; }
+.rml-off { all: unset; position: relative; width: 26px; height: 26px; margin: -8px -6px -8px -8px; cursor: pointer; }
+.rml-off::before { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--c); transform: translate(-50%, -50%); }
+.rml-plus { all: unset; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 17px;
+  color: var(--md-on-surface-variant); box-shadow: inset 0 0 0 1px #ffffff40; cursor: pointer; }
+.rmix-track { position: relative; height: 12px; border-radius: 6px; background: #2a2a2c; margin: 10px 0 6px; touch-action: none; cursor: pointer; }
+.rseg { position: absolute; top: 0; bottom: 0; }
+.rseg:first-child { border-radius: 6px 0 0 6px; }
+.rseg:last-child { border-radius: 0 6px 6px 0; }
+.rmh { position: absolute; top: -12px; bottom: -12px; width: 28px; margin-left: -14px; z-index: 2; }
+.rmh::before { content: ""; position: absolute; left: 12px; top: 6px; bottom: 6px; width: 4px; border-radius: 2px; background: #fff; }
+.rmix-menu { position: fixed; z-index: 90; min-width: 200px; padding: 6px; border-radius: 14px; background: #2c2c2e; box-shadow: 0 8px 28px #0009; display: flex; flex-direction: column; }
+.rmix-menu[hidden] { display: none; }
+.rmix-menu button { all: unset; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; font-size: 15px; color: #fff; }
+.rmix-menu button:active { background: #ffffff14; }
+.rmix-menu button i { width: 10px; height: 10px; border-radius: 50%; }
+/* очередь на пульте: без ↑, порядок — перетаскиванием (подержать палец ~0,3 с и тянуть) */
+#queue li.rq-src { opacity: .35; }
+.rq-line { position: fixed; height: 3px; border-radius: 2px; background: #fff; z-index: 95; pointer-events: none; }
+.rq-ghost { position: fixed; z-index: 96; pointer-events: none; padding: 10px 14px; border-radius: 12px; background: #2c2c2e; box-shadow: 0 8px 24px #000a; font-weight: 600; max-width: 70vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rq-dragging { user-select: none; -webkit-user-select: none; }
+/* теги в очереди пульта — справа, сразу слева от кнопки ▶ (не прыгают за длиной названия) */
+#queue li { display: flex; align-items: center; gap: 8px; }
+#queue li .m { flex: 1 1 auto; min-width: 0; }
+#queue li .m b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#queue li .rq-tags { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; margin: 0; }
+#queue li .a { flex: 0 0 auto; }
+#queue li .rq-tags .stag { height: 19px; padding: 0 7px; font-size: 10.5px; }
+#queue li .a { gap: 0; }
+#queue li .a button:not(.play) { width: 30px; min-width: 30px; }
+/* кружок направления на пульте: общие стили кнопок прятали его (слой ::before с opacity 0) и рисовали рамку */
+.rml-off { box-shadow: none !important; background: transparent !important; overflow: visible; display: inline-block; }
+.rml-off::before { inset: auto !important; left: 50% !important; top: 50% !important; opacity: 1 !important; z-index: 0 !important; width: 10px; height: 10px; }
+.rml-off:active::before { width: 12px; height: 3px; border-radius: 2px; }   /* при нажатии — «−» того же цвета */
+/* очередь пульта компактнее: мельче текст и кнопки — помещаются огоньки */
+#queue li { min-height: 52px; padding: 5px 8px; gap: 6px; }
+#queue li .m b { font-size: 13.5px; }
+#queue li .m > span { font-size: 11.5px; }
+#queue li .m span .fires { font-size: 11px; letter-spacing: 0; }
+#queue li .a button { width: 28px; min-width: 28px; height: 28px; min-height: 28px; font-size: 13px; }
+#queue li .a button .ico { width: 15px; height: 15px; }
+#queue li .a button.play { width: 34px; min-width: 34px; height: 34px; min-height: 34px; margin-right: 2px; }
+#queue li .a button.play .ico { width: 14px; height: 14px; }
+/* очередь пульта: строки во всю ширину экрана (за края карточки), выделенная — сплошной полосой без скруглений,
+   между треками — тонкие линии, справа от ✕ — меньше поле, теги ещё мельче */
+.card:has(#queue) { overflow: visible; }
+#queue { margin: 0; }
+#queue li { margin: 0 -28px; padding: 5px 16px 5px 28px; border-radius: 0; }
+#queue li + li { box-shadow: inset 0 1px 0 #ffffff14; }
+#queue li:first-child:not(.empty) { background: var(--md-surface-highest); border-radius: 0; }
+#queue li .rq-tags { gap: 2px; }
+#queue li .rq-tags .stag { height: 16px; padding: 0 6px; font-size: 9.5px; font-weight: 600; }
+/* карточка «сейчас играет» — без обводки (её рисовало общее правило material.css для #now) */
+#now.np { box-shadow: none !important; outline: none !important; border: 0 !important; }
+/* на широком экране (пульт уже экрана) строки очереди — точно по краям карточки, а не шире неё */
+@media (min-width: 625px) {
+  #queue li { margin: 0 -16px; padding-left: 16px; padding-right: 8px; }
+  .card:has(#queue) { overflow: hidden; }
+}
+/* на пульте — без обводок у карточек и у переключателя «Настроение» */
+.card, .card.pad { box-shadow: none !important; outline: none !important; border: 0 !important; }
+#energy.seg { box-shadow: none !important; }
+/* строка трека в очереди пульта: название / исполнитель / BPM и огоньки — три строчки */
+#queue li .m .q-art, #queue li .m .q-bpm { display: block; font-size: 11.5px; line-height: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--md-on-surface-variant); }
+#queue li .m .q-bpm { font-variant-numeric: tabular-nums; }
+#queue li .m b { line-height: 18px; }
+/* меньше боковые поля пульта: от края экрана 6 px, внутри карточек 12 px (строки очереди по-прежнему до краёв экрана) */
+body { padding-left: 6px; padding-right: 6px; }
+.card.pad { padding-left: 12px; padding-right: 12px; }
+.np { padding-left: 16px; padding-right: 14px; }
+#queue li { margin: 0 -18px; padding-left: 18px; padding-right: 10px; }
+@media (min-width: 625px) { #queue li { margin: 0 -12px; padding-left: 12px; padding-right: 6px; } }
+/* полоса прокрутки на пульте скрыта (страница прокручивается пальцем как обычно) */
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none; }
+/* пульт на всю ширину экрана: без боковых полей, карточки от края до края (без скруглений по бокам) */
+body { padding-left: 0 !important; padding-right: 0 !important; max-width: none; }
+header { padding-left: 12px; padding-right: 12px; }
+.card, .card.pad { border-radius: 20px; margin-left: 0; margin-right: 0; margin-bottom: 8px; }
+.np { border-radius: 30px; margin-left: 0; margin-right: 0; }
+#queue li { margin: 0 -12px; padding-left: 12px; padding-right: 8px; }
+.card:has(#queue) { overflow: hidden; }
+.banner { margin-left: 0; margin-right: 0; }
+/* поля пульта: на телефоне по 10 px с краёв; на компьютере — колонка в треть экрана посередине */
+body { padding-left: 10px !important; padding-right: 10px !important; max-width: none; margin: 0 auto; }
+header { padding-left: 2px; padding-right: 2px; }
+@media (min-width: 1024px) { body { width: 33.333vw; min-width: 420px; } }
+/* заголовок «Очередь» и «пересобрать» — чуть выше и не прилипают к трекам */
+.card:has(#queue) { padding-top: 10px; }
+.card:has(#queue) .head { margin-bottom: 12px; }
+/* «Настроение» на пульте: под невыбранными кнопками — фон карточки, без отдельной подложки */
+#energy.seg { background: #000 !important; }   /* под невыбранными кнопками — чёрный, как фон страницы */
+#energy.seg button:not(.on) { background: transparent !important; }
+/* громкость на пульте: полоса короче, ползунок мельче, значок динамика крупнее */
+.vol { gap: 10px; }
+.vol > .ico { width: 26px !important; height: 26px !important; }
+.vol input { flex: 0 1 220px; max-width: 220px; }
+#vol::-webkit-slider-thumb { width: 14px !important; height: 14px !important; margin-top: -5px !important; box-shadow: none !important; }
+#vol::-moz-range-thumb { width: 14px !important; height: 14px !important; box-shadow: none !important; }
+/* выделенный (первый) трек в очереди пульта — со скруглением */
+#queue li:first-child:not(.empty) { border-radius: 14px !important; }
+.note-ic { display: inline-flex; vertical-align: -2px; margin-right: 5px; color: #fff; }
+.note-ic .ico { width: 14px; height: 14px; }
+.note-tip { position: fixed; z-index: 120; padding: 8px 11px; border-radius: 10px; background: #2c2c2e; color: #fff; font-size: 13px; line-height: 1.35;
+  white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: 0 8px 24px #000a; pointer-events: none; }
+.note-tip[hidden] { display: none; }
+
+/* прослушивание на телефоне: кнопка 🎧 у трека и панель внизу */
+.list .a button.lsn .ico { width: 19px; height: 19px; }
+.list li.pv-cur .a button.lsn { color: #fff; }
+.pv { position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 60; padding: 10px 12px 10px; border-radius: 18px; background: #1f1f22; box-shadow: 0 10px 34px #000c; display: flex; flex-direction: column; gap: 8px; }
+.pv[hidden] { display: none; }
+@media (min-width: 1024px) { .pv { left: 50%; right: auto; width: calc(100vw / 3 - 20px); transform: translateX(-50%); } }
+.pv-top { display: flex; align-items: center; gap: 10px; }
+.pv-ic { display: flex; color: #fff; }
+.pv-ic .ico { width: 20px; height: 20px; }
+.pv-m { flex: 1; min-width: 0; }
+.pv-m b { display: block; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-m span { display: block; font-size: 12px; color: var(--md-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-btn { width: 38px; height: 38px; min-height: 38px; padding: 0; border-radius: 50%; background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pv-btn .ico { width: 20px; height: 20px; }
+.pv-bar { position: relative; height: 18px; display: flex; align-items: center; cursor: pointer; touch-action: none; }
+.pv-bar::before { content: ""; position: absolute; left: 0; right: 0; height: 4px; border-radius: 2px; background: #ffffff26; }
+.pv-fill { position: relative; height: 4px; border-radius: 2px; background: #fff; }
+.pv-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--md-on-surface-variant); font-variant-numeric: tabular-nums; }
+.pv-go { height: 34px; min-height: 34px; padding: 0 16px; border-radius: 17px; background: #fff; color: #000; font-weight: 700; font-size: 13px; }
+body.pv-on { padding-bottom: 130px; }
+
+/* меню трека (подержать палец на треке в очереди) */
+.list li.rq-hold { background: var(--md-surface-highest); transform: scale(.98); transition: transform .15s; }
+.tm { position: fixed; inset: 0; z-index: 70; background: #0000; transition: background .2s, backdrop-filter .2s, -webkit-backdrop-filter .2s; }
+.tm.on { background: #0008; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.tm-row { position: fixed; margin: 0; transition: top .22s ease; }
+.tm-row li { background: #2c2c2e !important; box-shadow: 0 8px 30px #000a; }
+.tm-sheet { position: fixed; left: 10px; right: 10px; max-height: calc(100vh - 110px); overflow-y: auto; scrollbar-width: none; padding: 12px 14px 14px; border-radius: 20px; background: #1f1f22; box-shadow: 0 12px 40px #000c; display: flex; flex-direction: column; gap: 12px; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; box-sizing: border-box; }
+.tm.on .tm-sheet { opacity: 1; transform: none; }
+@media (min-width: 1024px) { .tm-sheet { left: calc(50% - 100vw / 6 + 10px); right: auto; width: calc(100vw / 3 - 20px); } }
+.tm-sec { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tm-sec.col { flex-direction: column; align-items: stretch; gap: 6px; }
+.tm-l { font-size: 13px; color: var(--md-on-surface-variant); }
+.tm-fires { display: flex; gap: 4px; }
+.tm-fires button { width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%; background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; }
+.tm-fires button .ico { width: 24px; height: 24px; }
+.tm-bpm { display: flex; gap: 8px; align-items: center; }
+.tm-bpm input { width: 86px; height: 40px; border-radius: 12px; border: 0; background: #2c2c2e; color: #fff; font: inherit; font-size: 17px; font-weight: 700; text-align: center; }
+.tm-tap { height: 40px; min-height: 40px; padding: 0 18px; border-radius: 20px; background: #2c2c2e; color: #fff; font-weight: 700; }
+.tm-tap.hit { background: #fff; color: #000; }
+#tmNote { width: 100%; box-sizing: border-box; border: 0; border-radius: 12px; background: #2c2c2e; color: #fff; font: inherit; font-size: 15px; padding: 10px 12px; resize: vertical; }
+.tm-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tm-tags button { display: inline-flex; align-items: center; gap: 7px; height: 32px; min-height: 32px; padding: 0 12px; border-radius: 16px; background: transparent; color: #fff; font-size: 13px; box-shadow: inset 0 0 0 1px #ffffff30; }
+.tm-tags button i { width: 9px; height: 9px; border-radius: 50%; }
+.tm-tags button.on { background: #ffffff1f; box-shadow: none; }
+.tm-act { display: flex; gap: 8px; }
+.tm-act button { flex: 1; height: 40px; min-height: 40px; border-radius: 20px; background: #2c2c2e; color: #fff; font-size: 13px; font-weight: 600; padding: 0 8px; }
+.tm-act button.danger { color: #ff6b62; }
+.tm-foot { display: flex; gap: 8px; }
+.tm-foot button { flex: 1; height: 44px; min-height: 44px; border-radius: 22px; background: #2c2c2e; color: #fff; font-weight: 700; }
+.tm-foot button.pri { background: #fff; color: #000; }
+
+/* долгое нажатие на трек не выделяет текст и не вызывает системное меню телефона */
+.list li, .tm-row { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.tm-share { height: 40px; min-height: 40px; border-radius: 20px; background: #2c2c2e; color: #fff; font-size: 13px; font-weight: 600; }
+
+/* iPhone: нижние панели не прячутся под полоску «домой»; прокрутка меню трека не уводит страницу */
+.pv { bottom: calc(10px + env(safe-area-inset-bottom)); }
+body.pv-on { padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
+.tm-sheet { overscroll-behavior: contain; max-height: calc(100vh - 110px - env(safe-area-inset-bottom)); }
+.tm { overscroll-behavior: contain; }

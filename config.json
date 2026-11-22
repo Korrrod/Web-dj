@@ -1,0 +1,5 @@
+{
+  "musicRoot": "..",
+  "port": 8765,
+  "openBrowser": true
+}
