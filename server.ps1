@@ -18,13 +18,10 @@ $Json.MaxJsonLength = [int]::MaxValue
 $MusicRoot = '..'
 $Port = 8765
 $OpenBrowser = $true
-# files dropped into the web page land right in the music folder; config.json "uploadDir" (a subfolder or a full path) changes it
-$UploadName = ''
 if (Test-Path -LiteralPath $ConfigPath) {
     try {
         $cfg = [IO.File]::ReadAllText($ConfigPath, [Text.Encoding]::UTF8) | ConvertFrom-Json
         if ($cfg.musicRoot) { $MusicRoot = [string]$cfg.musicRoot }
-        if ($cfg.uploadDir) { $UploadName = [string]$cfg.uploadDir }
         if ($cfg.port) { $Port = [int]$cfg.port }
         if ($cfg.openBrowser -eq $false) { $OpenBrowser = $false }
     } catch { Write-Host "config.json is broken, using defaults: $_" -ForegroundColor Yellow }
@@ -42,15 +39,13 @@ if ((Test-Path -LiteralPath $OldCringeDir) -and -not (Test-Path -LiteralPath $Cr
 $AudioTypes = @{
     '.mp3' = 'audio/mpeg'; '.flac' = 'audio/flac'; '.m4a' = 'audio/mp4'; '.mp4' = 'audio/mp4';
     '.aac' = 'audio/aac'; '.ogg' = 'audio/ogg'; '.oga' = 'audio/ogg'; '.opus' = 'audio/ogg';
-    '.wav' = 'audio/wav'; '.aif' = 'audio/aiff'; '.aiff' = 'audio/aiff'; '.webm' = 'audio/webm'; '.weba' = 'audio/webm'
+    '.wav' = 'audio/wav'; '.aif' = 'audio/aiff'; '.aiff' = 'audio/aiff'
 }
-if (-not $UploadName) { $UploadDir = $MusicRoot } elseif ([IO.Path]::IsPathRooted($UploadName)) { $UploadDir = $UploadName } else { $UploadDir = Join-Path $MusicRoot $UploadName }
-$UploadDir = [IO.Path]::GetFullPath($UploadDir).TrimEnd('\') + '\'
 $WebTypes = @{ '.html' = 'text/html; charset=utf-8'; '.js' = 'text/javascript; charset=utf-8'; '.css' = 'text/css; charset=utf-8'; '.svg' = 'image/svg+xml'; '.png' = 'image/png'; '.ico' = 'image/x-icon'; '.json' = 'application/json; charset=utf-8' }
 $MaxChunk = 1MB   # open-ended ranges are answered in pieces so one stream never blocks the server
 $Utf8 = New-Object Text.UTF8Encoding $false
 # bump together with SERVER_VERSION in web/common.js: pages show "restart Start.bat" when they differ
-$ServerVersion = 17
+$ServerVersion = 14
 $Reasons = @{ 200 = 'OK'; 206 = 'Partial Content'; 400 = 'Bad Request'; 403 = 'Forbidden'; 404 = 'Not Found'; 405 = 'Method Not Allowed'; 416 = 'Range Not Satisfiable'; 500 = 'Internal Server Error' }
 
 $script:Files = @()
@@ -453,43 +448,6 @@ function Write-Tags([string]$key, [int]$bpm, [int]$x, $txt) {
     return $r
 }
 function Write-TagBpm([string]$key, [int]$bpm) { return Write-Tags $key $bpm -1 }
-
-# a copy of the track for "copy file" / "share": named "BPM - Artist - Title.ext" (the page sends the name),
-# with the library's BPM, fires and own title/artist/comment written into the copy's tags; the original is not touched
-$ExportRoot = Join-Path ([IO.Path]::GetTempPath()) 'SwingDJ-share'
-function Export-Copy($d) {
-    $key = ([string]$d['key']).ToLowerInvariant()
-    $f = $script:Files[$script:ByKey[$key]]
-    $ext = $f.Extension
-    $name = [IO.Path]::GetFileNameWithoutExtension([string]$d['name'])
-    foreach ($ch in [IO.Path]::GetInvalidFileNameChars()) { $name = $name.Replace([string]$ch, '') }
-    $name = $name.Trim().TrimEnd('.')
-    if (-not $name) { $name = [IO.Path]::GetFileNameWithoutExtension($f.Name) }
-    if ($name.Length -gt 150) { $name = $name.Substring(0, 150).Trim() }
-    # old copies (older than a day) are cleaned up; each copy gets its own folder so a pasted file is never overwritten
-    if (Test-Path -LiteralPath $ExportRoot) {
-        Get-ChildItem -LiteralPath $ExportRoot -Directory -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-1) } |
-            ForEach-Object { try { Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction Stop } catch { } }
-    }
-    $dir = Join-Path $ExportRoot ([DateTime]::Now.ToString('yyyyMMdd-HHmmss-fff'))
-    [void][IO.Directory]::CreateDirectory($dir)
-    $dest = Join-Path $dir ($name + $ext)
-    [IO.File]::Copy($f.FullName, $dest, $true)
-    $bpm = -1; if ($d.ContainsKey('b') -and $null -ne $d['b'] -and [int]$d['b'] -ge 40 -and [int]$d['b'] -le 400) { $bpm = [int]$d['b'] }
-    $x = -1; if ($d.ContainsKey('x') -and $null -ne $d['x'] -and [int]$d['x'] -ge 0 -and [int]$d['x'] -le 3) { $x = [int]$d['x'] }
-    $txt = @{}; foreach ($f0 in @('title', 'artist', 'note')) { if ($d.ContainsKey($f0) -and $null -ne $d[$f0]) { $txt[$f0] = ([string]$d[$f0]).Trim() } }
-    $e = $ext.ToLowerInvariant()
-    if ($bpm -ne -1 -or $x -ge 0 -or $txt.Count) {
-        $r = 'unsupported'
-        try {
-            if ($e -eq '.mp3') { $r = Set-Mp3Tags $dest $bpm $x $true $txt }
-            elseif ($e -eq '.flac') { $r = Set-FlacTags $dest $bpm $x $true $txt }
-        } catch { $r = 'error:' + $_.Exception.Message }
-        if ($r -like 'error:*') { Write-Host "Tags on the copy failed ($($f.Name)): $r" -ForegroundColor DarkYellow }
-    }
-    Write-Host "Copy for sharing: $dest" -ForegroundColor DarkCyan
-    return $dest
-}
 # postponed rebuilds: run once their track is no longer playing
 function Flush-TagPending {
     foreach ($k in @($script:TagPending.Keys)) {
@@ -561,8 +519,7 @@ function Read-Request($stream) {
     $body = [byte[]]@()
     if ($hdr.ContainsKey('content-length')) {
         $len = [int]$hdr['content-length']
-        $max = 64MB; if ($path -like '/api/upload*') { $max = 1GB }   # a dropped track (flac/wav) can be big
-        if ($len -gt $max) { return $null }
+        if ($len -gt 64MB) { return $null }
         $body = New-Object byte[] $len
         $got = [Math]::Min($len, $all.Length - ($headEnd + 4))
         if ($got -gt 0) { [Array]::Copy($all, $headEnd + 4, $body, 0, $got) } else { $got = 0 }
@@ -768,63 +725,6 @@ function Handle($ctx) {
             $info = [System.Collections.Generic.Dictionary[string,object]]::new()
             $info.Add('port', [int]$Port); $info.Add('ips', [string[]](Lan-Addresses)); $info.Add('version', [int]$ServerVersion)
             Send-Text $ctx ($Json.Serialize($info)); return
-        }
-        '/api/copyfile' {
-            # put the track file itself on this computer's clipboard (as if copied in Explorer): paste it into a folder, Telegram, mail...
-            if (-not $ctx.Local) { Send-Text $ctx '{"error":"local-only"}' 'application/json' 403; return }
-            if ($method -ne 'POST') { Send-Text $ctx '{}' 'application/json' 405; return }
-            $d = $Json.DeserializeObject((Body-Text $ctx))
-            $key = ([string]$d['key']).ToLowerInvariant()
-            if (-not $script:ByKey.ContainsKey($key)) { Send-Text $ctx '{"error":"not-found"}' 'application/json' 404; return }
-            $full = $script:Files[$script:ByKey[$key]].FullName
-            try { $full = Export-Copy $d } catch { Write-Host "Export copy failed, copying the original: $($_.Exception.Message)" -ForegroundColor DarkYellow }
-            # the clipboard needs an STA thread, so a short separate PowerShell does it; the command is passed encoded (Cyrillic-safe)
-            $cmd = "Set-Clipboard -LiteralPath '" + $full.Replace("'", "''") + "'"
-            $enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($cmd))
-            try {
-                $p = Start-Process powershell -ArgumentList '-NoProfile', '-STA', '-NonInteractive', '-EncodedCommand', $enc -WindowStyle Hidden -PassThru
-                [void]$p.WaitForExit(8000)
-                Send-Text $ctx ('{"ok":' + $(if ($p.HasExited -and $p.ExitCode -eq 0) { 'true' } else { 'false' }) + '}') 'application/json'
-            } catch { Send-Text $ctx '{"ok":false}' 'application/json' 500 }
-        }
-        '/api/exportfile' {
-            # the same named + tagged copy as for the clipboard, sent back for "Share" / download (phone too)
-            if ($method -ne 'POST') { Send-Text $ctx '{}' 'application/json' 405; return }
-            $d = $Json.DeserializeObject((Body-Text $ctx))
-            $key = ([string]$d['key']).ToLowerInvariant()
-            if (-not $script:ByKey.ContainsKey($key)) { Send-Text $ctx '{"error":"not-found"}' 'application/json' 404; return }
-            $f = $script:Files[$script:ByKey[$key]]; $full = $f.FullName
-            try { $full = Export-Copy $d } catch { Write-Host "Export copy failed, sending the original: $($_.Exception.Message)" -ForegroundColor DarkYellow }
-            Send-File $ctx $full $AudioTypes[$f.Extension.ToLowerInvariant()]
-            return
-        }
-        '/api/upload' {
-            # a track dropped into the page (or picked on the phone): raw file bytes in the body, ?name=<file name>
-            # it is saved into the upload folder inside the music folder; the page then rescans and adds it
-            if ($method -ne 'POST') { Send-Text $ctx '{}' 'application/json' 405; return }
-            $name = [IO.Path]::GetFileName([string]$req.Query['name'])
-            foreach ($ch in [IO.Path]::GetInvalidFileNameChars()) { $name = $name.Replace([string]$ch, '') }
-            $name = $name.Trim().TrimEnd('.')
-            $ext = [IO.Path]::GetExtension($name).ToLowerInvariant()
-            if (-not $name -or -not $AudioTypes.ContainsKey($ext)) { Send-Text $ctx ('{"error":"type","ext":' + $Json.Serialize($ext) + '}') 'application/json' 400; return }
-            $data = $req.Body
-            if (-not $data -or $data.Length -lt 1024) { Send-Text $ctx '{"error":"empty"}' 'application/json' 400; return }
-            if ($req.Headers.ContainsKey('content-length') -and $data.Length -ne [int]$req.Headers['content-length']) { Send-Text $ctx '{"error":"short"}' 'application/json' 400; return }
-            try {
-                if (-not (Test-Path -LiteralPath $UploadDir)) { [void][IO.Directory]::CreateDirectory($UploadDir) }
-                $base = [IO.Path]::GetFileNameWithoutExtension($name)
-                $dest = Join-Path $UploadDir $name; $k = 2; $dup = $false
-                while (Test-Path -LiteralPath $dest) {
-                    # the same file dropped again is not copied twice
-                    if ((Get-Item -LiteralPath $dest).Length -eq $data.Length) { $dup = $true; break }
-                    $dest = Join-Path $UploadDir ("$base ($k)$ext"); $k++
-                }
-                if (-not $dup) { [IO.File]::WriteAllBytes($dest, $data); Write-Host "Added track: $dest" -ForegroundColor Green }
-            } catch { Send-Text $ctx ('{"error":' + $Json.Serialize('save: ' + $_.Exception.Message) + '}') 'application/json' 500; return }
-            $key = ''
-            if ($dest.StartsWith($MusicRoot, [StringComparison]::OrdinalIgnoreCase)) { $key = $dest.Substring($MusicRoot.Length).ToLowerInvariant() }
-            Send-Text $ctx ('{"ok":true,"dup":' + $(if ($dup) { 'true' } else { 'false' }) + ',"key":' + $Json.Serialize($key) + '}')
-            return
         }
         '/api/trash' {
             # the file is only moved to the 'not my taste' folder (it can be moved back), so the phone (tinder) may do it too
